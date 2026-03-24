@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Social Engineering – Audio-Beispiel Bankanruf</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #121a2f;
+      --card: #1a2440;
+      --text: #eef2ff;
+      --muted: #b8c1e0;
+      --line: #30406d;
+      --accent: #60a5fa;
+      --good: #22c55e;
+      --bad: #ef4444;
+      --warn: #f59e0b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: linear-gradient(180deg, #08101d, var(--bg));
+      color: var(--text);
+    }
+    .wrap {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 28px 16px 48px;
+    }
+    .hero, .card {
+      background: rgba(18, 26, 47, 0.96);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 22px;
+      box-shadow: 0 12px 30px rgba(0,0,0,.28);
+    }
+    .hero { margin-bottom: 18px; }
+    .grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+    }
+    @media (max-width: 860px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+    .tag {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #112749;
+      color: #93c5fd;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    .audioBox {
+      background: #0b1324;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+      margin-top: 12px;
+    }
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 15px;
+      cursor: pointer;
+      margin: 6px 8px 0 0;
+    }
+    .primary { background: #2563eb; color: white; }
+    .secondary { background: #334155; color: white; }
+    .good { background: #14532d; color: white; }
+    .bad { background: #7f1d1d; color: white; }
+    .warn { background: #78350f; color: white; }
+    .status, .result {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 14px;
+      background: #0b1324;
+      border: 1px solid var(--line);
+      min-height: 58px;
+    }
+    .script {
+      white-space: pre-line;
+      background: #0b1324;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      color: var(--muted);
+      margin-top: 12px;
+    }
+    .score {
+      font-weight: 700;
+      color: var(--accent);
+      margin-top: 10px;
+      font-size: 18px;
+    }
+    ul li, ol li { margin-bottom: 10px; }
+    .small { color: var(--muted); font-size: 14px; }
+    .live {
+      color: #fde68a;
+      font-weight: 600;
+    }
+    .meter {
+      height: 10px;
+      background: #101827;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+    .bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #60a5fa, #f59e0b, #ef4444);
+      transition: width .25s ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="tag">Audio-Beispiel</div>
+      <h1>Fake-Bankanruf anhören und erkennen</h1>
+      <p>Diese Übungsseite simuliert einen typischen Social-Engineering-Anruf. Du hörst den Anruf per Browser-Stimme und entscheidest danach, was verdächtig war und wie man sicher reagiert.</p>
+      <p class="small">Hinweis: Die Audiofunktion nutzt die Vorlesestimme deines Browsers. Auf manchen Geräten kann die Stimme leicht anders klingen oder erst nach dem ersten Klick verfügbar sein.</p>
+    </section>
+
+    <div class="grid">
+      <section class="card">
+        <h2>Anrufsimulation</h2>
+        <div class="audioBox">
+          <p><strong>Szenario:</strong> Angeblicher Sicherheitsanruf deiner Bank wegen eines „verdächtigen Logins“.</p>
+          <button class="primary" onclick="playCall()">▶ Anruf starten</button>
+          <button class="secondary" onclick="pauseCall()">⏸ Pause</button>
+          <button class="secondary" onclick="resumeCall()">⏵ Weiter</button>
+          <button class="warn" onclick="stopCall()">■ Stop</button>
+          <div class="meter"><div id="bar" class="bar"></div></div>
+          <div id="status" class="status">Noch nicht gestartet.</div>
+        </div>
+
+        <details style="margin-top:14px;">
+          <summary>Text des simulierten Anrufs anzeigen</summary>
+          <div class="script" id="scriptText">Guten Tag, hier ist die Sicherheitsabteilung Ihrer Bank.
+Wir haben einen verdächtigen Zugriff auf Ihr Konto festgestellt.
+Damit wir die Sperre aufheben können, müssen Sie Ihre Identität sofort bestätigen.
+Bitte nennen Sie mir jetzt Ihre Online-Banking-Zugangsdaten oder die TAN, die Sie gleich per SMS erhalten.
+Wenn Sie das nicht sofort machen, wird Ihr Konto aus Sicherheitsgründen gesperrt.
+Bleiben Sie bitte in der Leitung und legen Sie nicht auf.</div>
+        </details>
+      </section>
+
+      <section class="card">
+        <h2>Was fällt dir auf?</h2>
+        <p>Welche Warnzeichen hörst du im Anruf?</p>
+        <label><input type="checkbox" value="a"> Druck: „sofort“, „nicht auflegen“</label><br>
+        <label><input type="checkbox" value="b"> Forderung nach Zugangsdaten oder TAN</label><br>
+        <label><input type="checkbox" value="c"> Bank ruft an und darf deshalb alles fragen</label><br>
+        <label><input type="checkbox" value="d"> Angst durch Kontosperre</label><br>
+        <label><input type="checkbox" value="e"> Unklare Identität des Anrufers</label><br>
+        <button class="primary" onclick="checkAudioFlags()">Prüfen</button>
+        <div id="flagsResult" class="result">Noch nicht geprüft.</div>
+        <p class="score" id="score">Punkte: 0</p>
+      </section>
+    </div>
+
+    <section class="card" style="margin-top:18px;">
+      <h2>Wie reagierst du richtig?</h2>
+      <button class="good" onclick="reaction(1)">Auflegen, die offizielle Nummer der Bank selbst suchen und dort zurückrufen</button>
+      <button class="bad" onclick="reaction(2)">Die TAN nennen, damit das Konto nicht gesperrt wird</button>
+      <button class="bad" onclick="reaction(3)">In der Leitung bleiben und erst mal diskutieren</button>
+      <div id="reactionResult" class="result">Wähle eine Reaktion.</div>
+    </section>
+
+    <section class="card" style="margin-top:18px;">
+      <h2>Wenn man schon etwas gesagt hat</h2>
+      <ol>
+        <li>Sofort selbst bei der Bank über die offizielle Nummer anrufen.</li>
+        <li>Zugang sperren oder sperren lassen.</li>
+        <li>Passwort ändern und 2-Faktor-Schutz prüfen.</li>
+        <li>Falls eine TAN oder Kartendaten weitergegeben wurden: Bank/Karte sofort sichern.</li>
+        <li>Uhrzeit, Nummer und Gesprächsinhalte notieren und Screenshots sichern.</li>
+        <li>Bei Schaden den Vorfall melden und Anzeige erstatten.</li>
+      </ol>
+    </section>
+  </div>
+
+  <script>
+    let points = 0;
+    let utterance = null;
+    let progress = 0;
+    let timer = null;
+
+    const callText = `Guten Tag, hier ist die Sicherheitsabteilung Ihrer Bank. Wir haben einen verdächtigen Zugriff auf Ihr Konto festgestellt. Damit wir die Sperre aufheben können, müssen Sie Ihre Identität sofort bestätigen. Bitte nennen Sie mir jetzt Ihre Online-Banking-Zugangsdaten oder die TAN, die Sie gleich per SMS erhalten. Wenn Sie das nicht sofort machen, wird Ihr Konto aus Sicherheitsgründen gesperrt. Bleiben Sie bitte in der Leitung und legen Sie nicht auf.`;
+
+    function setStatus(text) {
+      document.getElementById('status').innerHTML = text;
+    }
+
+    function addPoint() {
+      points += 1;
+      document.getElementById('score').innerText = 'Punkte: ' + points;
+    }
+
+    function animateBar(start = 0) {
+      clearInterval(timer);
+      progress = start;
+      timer = setInterval(() => {
+        if (speechSynthesis.speaking && !speechSynthesis.paused) {
+          progress = Math.min(progress + 2, 100);
+          document.getElementById('bar').style.width = progress + '%';
+          if (progress >= 100) clearInterval(timer);
+        }
+      }, 260);
+    }
+
+    function pickGermanVoice() {
+      const voices = speechSynthesis.getVoices();
+      return voices.find(v => v.lang && v.lang.toLowerCase().startsWith('de')) || voices[0] || null;
+    }
+
+    function playCall() {
+      stopCall();
+      utterance = new SpeechSynthesisUtterance(callText);
+      utterance.lang = 'de-DE';
+      utterance.rate = 0.95;
+      utterance.pitch = 0.95;
+      const voice = pickGermanVoice();
+      if (voice) utterance.voice = voice;
+
+      utterance.onstart = () => {
+        setStatus('<span class="live">Anruf läuft…</span><br>Hör auf Druck, Angst, Forderung nach TAN und auf die Aufforderung, in der Leitung zu bleiben.');
+        animateBar(0);
+      };
+      utterance.onend = () => {
+        document.getElementById('bar').style.width = '100%';
+        setStatus('Anruf beendet. Jetzt kannst du die Warnzeichen prüfen und die richtige Reaktion auswählen.');
+        clearInterval(timer);
+      };
+      utterance.onerror = () => {
+        setStatus('Die Audiofunktion konnte in diesem Browser gerade nicht starten. Du kannst trotzdem den eingeblendeten Text lesen und die Fragen lösen.');
+        clearInterval(timer);
+      };
+
+      speechSynthesis.speak(utterance);
+    }
+
+    function pauseCall() {
+      if (speechSynthesis.speaking && !speechSynthesis.paused) {
+        speechSynthesis.pause();
+        setStatus('Audio pausiert.');
+      }
+    }
+
+    function resumeCall() {
+      if (speechSynthesis.paused) {
+        speechSynthesis.resume();
+        setStatus('<span class="live">Anruf läuft wieder…</span>');
+      }
+    }
+
+    function stopCall() {
+      speechSynthesis.cancel();
+      clearInterval(timer);
+      progress = 0;
+      document.getElementById('bar').style.width = '0%';
+      setStatus('Anruf gestoppt. Du kannst ihn erneut starten.');
+    }
+
+    function checkAudioFlags() {
+      const checked = [...document.querySelectorAll('input[type=checkbox]:checked')].map(x => x.value);
+      const correct = ['a','b','d','e'];
+      const ok = correct.every(v => checked.includes(v)) && !checked.includes('c');
+      const box = document.getElementById('flagsResult');
+      if (ok) {
+        box.innerHTML = 'Genau. Der Anrufer arbeitet mit Zeitdruck, Angst, unklarer Identität und will TAN oder Zugangsdaten. Das ist ein starkes Betrugssignal.';
+        addPoint();
+      } else {
+        box.innerHTML = 'Noch nicht ganz. Besonders wichtig sind: Druck, Angst vor Sperre, Forderung nach TAN/Zugangsdaten und die unklare Identität des Anrufers.';
+      }
+    }
+
+    function reaction(n) {
+      const box = document.getElementById('reactionResult');
+      if (n === 1) {
+        box.innerHTML = 'Richtig. Nie sensible Daten im Anruf durchgeben. Immer selbst über die offizielle Nummer oder App Kontakt aufnehmen.';
+        addPoint();
+      } else if (n === 2) {
+        box.innerHTML = 'Falsch. Eine echte Bank fordert dich am Telefon nicht auf, eine TAN zur Freigabe zu nennen.';
+      } else {
+        box.innerHTML = 'Nicht ideal. Am sichersten ist: Gespräch beenden und selbst über einen offiziellen Kanal prüfen.';
+      }
+    }
+
+    speechSynthesis.onvoiceschanged = () => {};
+  </script>
+</body>
+</html>

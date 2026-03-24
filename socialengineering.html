@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Social Engineering – Interaktives Beispiel</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --card: #1f2937;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --ok: #22c55e;
+      --warn: #f59e0b;
+      --bad: #ef4444;
+      --accent: #38bdf8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(180deg, #0b1220, var(--bg));
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 28px 18px 60px;
+    }
+    h1, h2, h3 { margin-top: 0; }
+    .hero, .card {
+      background: rgba(17, 24, 39, 0.95);
+      border: 1px solid #334155;
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+    .hero { margin-bottom: 18px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+    }
+    .pill {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #082f49;
+      color: #bae6fd;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    .example {
+      background: #0b1324;
+      border: 1px solid #334155;
+      padding: 14px;
+      border-radius: 14px;
+      margin: 12px 0;
+      white-space: pre-line;
+    }
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 15px;
+      cursor: pointer;
+      margin: 6px 8px 0 0;
+    }
+    .safe { background: #14532d; color: white; }
+    .danger { background: #7f1d1d; color: white; }
+    .neutral { background: #1d4ed8; color: white; }
+    .result {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 12px;
+      background: #0b1324;
+      border: 1px solid #334155;
+      min-height: 52px;
+    }
+    .checklist li { margin-bottom: 10px; }
+    .score {
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--accent);
+    }
+    .muted { color: var(--muted); }
+    .footer {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    a { color: #7dd3fc; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="pill">Lernseite</div>
+      <h1>Social Engineering erkennen</h1>
+      <p>Diese Seite zeigt dir typische Tricks: Druck, Angst, falsche Autorität, Zeitdruck und gefälschte Links. Alles hier ist nur zur Aufklärung gedacht.</p>
+      <p class="muted">Ziel: Du sollst verdächtige Nachrichten erkennen, bevor Daten, Geld oder Konten verloren gehen.</p>
+    </section>
+
+    <div class="grid">
+      <section class="card">
+        <h2>1) Mini-Szenario</h2>
+        <div class="example">
+Hallo,
+
+wir haben einen ungewöhnlichen Login auf Ihrem Konto festgestellt.
+Bitte bestätigen Sie innerhalb von 10 Minuten Ihre Daten, sonst wird Ihr Zugang gesperrt:
+www.meine-bank-sicherheit-login.net
+
+Mit freundlichen Grüßen
+Sicherheitsabteilung
+        </div>
+        <p>Wie würdest du reagieren?</p>
+        <button class="danger" onclick="answerScenario('richtig')">Nicht klicken, Absender/Domain prüfen, Bank direkt kontaktieren</button>
+        <button class="safe" onclick="answerScenario('falsch')">Sofort klicken und Daten eingeben, damit nichts gesperrt wird</button>
+        <div id="scenarioResult" class="result">Wähle eine Antwort.</div>
+      </section>
+
+      <section class="card">
+        <h2>2) Woran erkennt man den Trick?</h2>
+        <p>Klicke die Merkmale an, die verdächtig sind:</p>
+        <label><input type="checkbox" value="1"> Zeitdruck: „innerhalb von 10 Minuten“</label><br>
+        <label><input type="checkbox" value="2"> Unklare Anrede</label><br>
+        <label><input type="checkbox" value="3"> Fremde oder komische Domain</label><br>
+        <label><input type="checkbox" value="4"> Die Nachricht ist höflich formuliert, also sicher echt</label><br>
+        <button class="neutral" onclick="checkFlags()">Prüfen</button>
+        <div id="flagsResult" class="result">Noch nicht geprüft.</div>
+      </section>
+    </div>
+
+    <section class="card" style="margin-top:18px;">
+      <h2>3) Entscheidungs-Training</h2>
+      <p>Was ist die beste Reihenfolge?</p>
+      <button class="neutral" onclick="showDecision(1)">Link öffnen → Login eingeben → danach nachdenken</button>
+      <button class="neutral" onclick="showDecision(2)">Ruhe bewahren → nicht über den Link gehen → offiziellen Kontaktweg selbst suchen</button>
+      <button class="neutral" onclick="showDecision(3)">Nachricht an Freunde weiterleiten, damit sie auch klicken</button>
+      <div id="decisionResult" class="result">Wähle eine Option.</div>
+    </section>
+
+    <section class="card" style="margin-top:18px;">
+      <h2>4) Merkliste bei Social Engineering</h2>
+      <ul class="checklist">
+        <li><strong>Druck</strong>: „Sofort handeln“, „letzte Chance“, „Konto wird gesperrt“</li>
+        <li><strong>Autorität</strong>: angeblich Bank, Polizei, Chef, Paketdienst, Schule</li>
+        <li><strong>Emotionen</strong>: Angst, Schuld, Neugier, Hilfsbereitschaft</li>
+        <li><strong>Technische Täuschung</strong>: ähnlich aussehende Domains, falsche Nummern, gefälschte Login-Seiten</li>
+        <li><strong>Sicherer Gegencheck</strong>: immer selbst über die offizielle App, Website oder bekannte Nummer prüfen</li>
+      </ul>
+      <p class="score" id="scoreBox">Punktestand: 0</p>
+    </section>
+
+    <section class="card" style="margin-top:18px;">
+      <h2>5) Was tun, wenn man schon reagiert hat?</h2>
+      <ul>
+        <li>Passwort sofort ändern</li>
+        <li>Falls Banking betroffen ist: Bank oder Karten-Sperrservice sofort kontaktieren</li>
+        <li>2-Faktor-Authentifizierung aktivieren</li>
+        <li>Gerät auf Schadsoftware prüfen</li>
+        <li>Beweise sichern: Screenshots, E-Mails, SMS, Telefonnummern, Überweisungen</li>
+        <li>Den Vorfall melden</li>
+      </ul>
+    </section>
+
+    <p class="footer">Diese Demo ist eine harmlose Aufklärungsseite. Keine echten Logins, keine echte Dateneingabe.</p>
+  </div>
+
+  <script>
+    let score = 0;
+    function addScore(points) {
+      score += points;
+      document.getElementById('scoreBox').innerText = 'Punktestand: ' + score;
+    }
+
+    function answerScenario(type) {
+      const box = document.getElementById('scenarioResult');
+      if (type === 'richtig') {
+        box.innerHTML = 'Richtig. Typische Warnzeichen sind Zeitdruck, eine seltsame Domain und die Aufforderung, sensible Daten über einen Link einzugeben.';
+        addScore(1);
+      } else {
+        box.innerHTML = 'Nicht gut. Genau darauf zielt Social Engineering ab: Stress erzeugen, damit du ohne Prüfung klickst.';
+      }
+    }
+
+    function checkFlags() {
+      const checked = [...document.querySelectorAll('input[type=checkbox]:checked')].map(c => c.value);
+      const correct = ['1','2','3'];
+      const ok = correct.every(v => checked.includes(v)) && !checked.includes('4');
+      const box = document.getElementById('flagsResult');
+      if (ok) {
+        box.innerHTML = 'Sehr gut. Verdächtig sind Zeitdruck, unklare Ansprache und die merkwürdige Domain. Höflichkeit allein beweist gar nichts.';
+        addScore(1);
+      } else {
+        box.innerHTML = 'Fast. Achte besonders auf Zeitdruck, unklare Ansprache und die Domain. Die höfliche Formulierung ist kein Echtheitsbeweis.';
+      }
+    }
+
+    function showDecision(n) {
+      const box = document.getElementById('decisionResult');
+      if (n === 2) {
+        box.innerHTML = 'Genau. Nie direkt über verdächtige Links einsteigen. Öffne die offizielle App oder gib die bekannte Adresse selbst ein.';
+        addScore(1);
+      } else if (n === 1) {
+        box.innerHTML = 'Falsch. Erst klicken und dann nachdenken ist das Ziel der Angreifer.';
+      } else {
+        box.innerHTML = 'Falsch. Verdächtige Nachrichten sollte man nicht verbreiten.';
+      }
+    }
+  </script>
+</body>
+</html>
