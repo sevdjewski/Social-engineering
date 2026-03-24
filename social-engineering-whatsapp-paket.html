@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Social Engineering – WhatsApp/Paket Beispiel</title>
+  <style>
+    :root {
+      --bg: #f3f4f6;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --accent: #2563eb;
+      --good: #166534;
+      --bad: #991b1b;
+      --line: #d1d5db;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 24px 16px 48px;
+    }
+    .hero, .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    }
+    .hero { margin-bottom: 18px; }
+    .grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+    }
+    @media (max-width: 820px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+    .tag {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #dbeafe;
+      color: #1d4ed8;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    .phone {
+      background: #0f172a;
+      border-radius: 24px;
+      padding: 14px;
+      color: white;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+    .screen {
+      background: #e5e7eb;
+      color: #111827;
+      border-radius: 16px;
+      padding: 14px;
+      min-height: 420px;
+    }
+    .msg {
+      background: white;
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 10px;
+      border: 1px solid #d1d5db;
+    }
+    .msg.small {
+      font-size: 14px;
+      color: var(--muted);
+    }
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 14px;
+      cursor: pointer;
+      font-size: 15px;
+      margin: 8px 8px 0 0;
+    }
+    .primary { background: var(--accent); color: white; }
+    .good { background: #dcfce7; color: var(--good); }
+    .bad { background: #fee2e2; color: var(--bad); }
+    .result {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: #f9fafb;
+      min-height: 56px;
+    }
+    .steps li { margin-bottom: 10px; }
+    .score {
+      font-weight: 700;
+      color: #1d4ed8;
+      margin-top: 10px;
+    }
+    .footer {
+      color: var(--muted);
+      margin-top: 18px;
+      font-size: 14px;
+    }
+    .highlight {
+      background: #fef3c7;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="tag">Beispiel 2</div>
+      <h1>Social Engineering über Paket-SMS und WhatsApp</h1>
+      <p>Dieses Beispiel zeigt einen typischen Trick: Eine Nachricht behauptet, dein Paket könne nicht zugestellt werden. Ziel ist, dass du schnell klickst, eine Gebühr zahlst oder persönliche Daten eingibst.</p>
+    </section>
+
+    <div class="grid">
+      <section class="card">
+        <h2>Nachrichtenansicht</h2>
+        <div class="phone">
+          <div class="screen">
+            <div class="msg small">Unbekannte Nummer · heute 09:14</div>
+            <div class="msg">
+              Ihr Paket konnte nicht zugestellt werden. Bitte bestätigen Sie jetzt Ihre Adresse und zahlen Sie <span class="highlight">1,99 €</span> Versandkosten nach:
+              <br><br>
+              <strong>paket-hilfe-zustellung24.com</strong>
+            </div>
+            <div class="msg">
+              Letzte Erinnerung: Ohne Bestätigung geht Ihr Paket an den Absender zurück.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Deine Entscheidung</h2>
+        <p>Was ist hier am besten?</p>
+        <button class="good" onclick="choose(1)">Nicht auf den Link drücken, Sendung nur in der offiziellen App/Webseite prüfen</button>
+        <button class="bad" onclick="choose(2)">1,99 € zahlen, weil der Betrag klein ist und es dringend klingt</button>
+        <button class="bad" onclick="choose(3)">Zur Sicherheit die Nachricht an Freunde weiterleiten</button>
+        <div id="decision" class="result">Bitte wähle eine Option.</div>
+
+        <p class="score" id="score">Punkte: 0</p>
+      </section>
+    </div>
+
+    <section class="card" style="margin-top:18px;">
+      <h2>Warnzeichen anklicken</h2>
+      <p>Welche Punkte sind verdächtig?</p>
+      <label><input type="checkbox" value="a"> Unbekannte Nummer</label><br>
+      <label><input type="checkbox" value="b"> Kleine Gebühr von 1,99 €</label><br>
+      <label><input type="checkbox" value="c"> Druck: „letzte Erinnerung“</label><br>
+      <label><input type="checkbox" value="d"> Komische Domain statt offizieller Paketdienst-Seite</label><br>
+      <label><input type="checkbox" value="e"> Jede Nachricht zu einem Paket ist automatisch echt</label><br>
+      <button class="primary" onclick="checkSigns()">Auswerten</button>
+      <div id="signs" class="result">Noch nicht ausgewertet.</div>
+    </section>
+
+    <section class="card" style="margin-top:18px;">
+      <h2>Was wollen Täter hier erreichen?</h2>
+      <button class="primary" onclick="goal(1)">Kreditkarten- oder Adressdaten abgreifen</button>
+      <button class="primary" onclick="goal(2)">Dich trainieren, in Zukunft schneller auf Links zu klicken</button>
+      <button class="primary" onclick="goal(3)">Beides kann stimmen</button>
+      <div id="goalBox" class="result">Wähle eine Antwort.</div>
+    </section>
+
+    <section class="card" style="margin-top:18px;">
+      <h2>Wenn du schon geklickt hast</h2>
+      <ol class="steps">
+        <li>Kartendaten oder Zugangsdaten sofort sichern bzw. ändern.</li>
+        <li>Bei einer Zahlung die Bank oder den Kartenanbieter direkt kontaktieren.</li>
+        <li>Screenshots von Nachricht, Website und Nummer speichern.</li>
+        <li>Gerät prüfen, falls etwas heruntergeladen wurde.</li>
+        <li>Den Vorfall melden und bei Schaden Anzeige erstatten.</li>
+      </ol>
+    </section>
+
+    <p class="footer">Diese Übungsseite dient nur der Aufklärung. Keine echten Links, keine Dateneingabe.</p>
+  </div>
+
+  <script>
+    let points = 0;
+    function addPoint() {
+      points += 1;
+      document.getElementById('score').innerText = 'Punkte: ' + points;
+    }
+
+    function choose(n) {
+      const box = document.getElementById('decision');
+      if (n === 1) {
+        box.innerHTML = 'Richtig. Offizielle Sendungsverfolgung immer selbst öffnen, nie über einen verdächtigen Link in SMS oder Messenger.';
+        addPoint();
+      } else if (n === 2) {
+        box.innerHTML = 'Falsch. Gerade kleine Beträge wirken harmlos und sollen dich zum schnellen Zahlen verleiten.';
+      } else {
+        box.innerHTML = 'Falsch. Verdächtige Nachrichten sollten nicht verbreitet werden.';
+      }
+    }
+
+    function checkSigns() {
+      const selected = [...document.querySelectorAll('input[type=checkbox]:checked')].map(x => x.value);
+      const needed = ['a','b','c','d'];
+      const correct = needed.every(v => selected.includes(v)) && !selected.includes('e');
+      const box = document.getElementById('signs');
+      if (correct) {
+        box.innerHTML = 'Genau. Verdächtig sind unbekannte Nummer, Mini-Gebühr, Druck und eine seltsame Domain. Das ist ein klassisches Smishing-Muster.';
+        addPoint();
+      } else {
+        box.innerHTML = 'Noch nicht ganz. Achte besonders auf die Kombination aus Zeitdruck, kleiner Gebühr und nicht-offizieller Domain.';
+      }
+    }
+
+    function goal(n) {
+      const box = document.getElementById('goalBox');
+      if (n === 3) {
+        box.innerHTML = 'Richtig. Häufig geht es sowohl um Zahlungsdaten als auch darum, Opfer an schnelles, ungeprüftes Klicken zu gewöhnen.';
+        addPoint();
+      } else {
+        box.innerHTML = 'Teilweise richtig, aber umfassender ist: beides kann das Ziel sein.';
+      }
+    }
+  </script>
+</body>
+</html>
